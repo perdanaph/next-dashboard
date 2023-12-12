@@ -14,6 +14,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import React from 'react';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Create Invoice',
+};
 
 export default function Form({ customers }: { customers: CustomerField[] }) {
   async function toastCreateInvoice(formData: FormData) {
