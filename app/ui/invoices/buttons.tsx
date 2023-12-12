@@ -1,5 +1,12 @@
+'use client';
+import Swal from 'sweetalert2';
+import { deleteInvoice } from '@/app/lib/actions';
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import React, { FormEvent, FormEventHandler, useRef, useState } from 'react';
+import { useFormState } from 'react-dom';
+// import Swal from 'sweetalert2/dist/sweetalert2.js'
+// import 'sweetalert2/src/sweetalert2.scss'
 
 export function CreateInvoice() {
   return (
@@ -16,7 +23,7 @@ export function CreateInvoice() {
 export function UpdateInvoice({ id }: { id: string }) {
   return (
     <Link
-      href="/dashboard/invoices"
+      href={`/dashboard/invoices/${id}/edit`}
       className="rounded-md border p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />
@@ -25,12 +32,44 @@ export function UpdateInvoice({ id }: { id: string }) {
 }
 
 export function DeleteInvoice({ id }: { id: string }) {
+  const initalState = {
+    message: null,
+  };
+  const form = useRef<HTMLFormElement>(null);
+  // const deleteInvoiceWithId = deleteInvoice.bind(null, id);
+  const [state, formAction] = useFormState(deleteInvoice, initalState);
+  function confirmDelete(e: React.FormEvent<HTMLFormElement>) {
+    const formData = new FormData(e.currentTarget);
+    e.preventDefault();
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        formAction(formData);
+        Swal.fire({
+          title: 'Deleted!',
+          text: `invoce success deleted`,
+          icon: 'success',
+        });
+      }
+    });
+  }
+
   return (
     <>
-      <button className="rounded-md border p-2 hover:bg-gray-100">
-        <span className="sr-only">Delete</span>
-        <TrashIcon className="w-5" />
-      </button>
+      <form onSubmit={confirmDelete} ref={form}>
+        <input type="hidden" name="id" value={id} />
+        <button className="rounded-md border p-2 hover:bg-gray-100">
+          <span className="sr-only">Delete</span>
+          <TrashIcon className="w-4" />
+        </button>
+      </form>
     </>
   );
 }
